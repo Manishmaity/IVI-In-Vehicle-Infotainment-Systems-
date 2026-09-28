@@ -1,0 +1,53 @@
+digraph IVI_Architecture {
+	fontname=Helvetica fontsize=11 rankdir=TB splines=polyline
+	node [fontname=Helvetica fontsize=10 shape=box style="rounded,filled"]
+	subgraph cluster_apps {
+		color=gray40 label="Application Layer" style=dashed
+		MediaApp [label="Media Player App" fillcolor="#AED6F1"]
+		NavApp [label="Navigation App" fillcolor="#AED6F1"]
+		ProjApp [label="Projection Client
+(Android Auto / CarPlay)" fillcolor="#AED6F1"]
+	}
+	subgraph cluster_framework {
+		color=gray40 label="IVI Framework / System Services" style=dashed
+		MediaSvc [label="Media Service
+(MediaSession, AudioFocus)" fillcolor="#A9DFBF"]
+		NavSvc [label="Navigation Service
+(Location, Route Engine)" fillcolor="#A9DFBF"]
+		ProjSvc [label="Projection Service
+(MirrorLink / AAOS Projected)" fillcolor="#A9DFBF"]
+		TelephonySvc [label="Telephony Service
+(Call State Manager)" fillcolor="#A9DFBF"]
+		Compositor [label="Display Compositor /
+SurfaceFlinger" fillcolor="#A9DFBF"]
+	}
+	subgraph cluster_hal {
+		color=gray40 label="Hardware Abstraction Layer (HAL)" style=dashed
+		AudioHAL [label="Audio HAL" fillcolor="#F9E79F"]
+		GNSSHAL [label="GNSS / Sensor HAL" fillcolor="#F9E79F"]
+		DisplayHAL [label="Display HAL" fillcolor="#F9E79F"]
+		VehicleHAL [label="Vehicle HAL
+(CAN/Bus signals)" fillcolor="#F9E79F"]
+	}
+	subgraph cluster_hw {
+		color=gray40 label=Hardware style=dashed
+		Speakers [label="Speakers / Amp" fillcolor="#F5B7B1"]
+		GPS [label="GPS/GNSS Receiver" fillcolor="#F5B7B1"]
+		Screen [label="Center Display" fillcolor="#F5B7B1"]
+		CANBus [label="Vehicle CAN Bus" fillcolor="#F5B7B1"]
+	}
+	MediaApp -> MediaSvc [label="AIDL: playback control"]
+	NavApp -> NavSvc [label="AIDL: route request"]
+	ProjApp -> ProjSvc [label="USB/Wi-Fi: mirroring stream"]
+	MediaSvc -> AudioHAL [label="audio stream + focus events"]
+	NavSvc -> GNSSHAL [label="location fix request"]
+	ProjSvc -> Compositor [label="rendered frame buffer"]
+	TelephonySvc -> MediaSvc [label="AudioFocus interrupt (call)"]
+	TelephonySvc -> VehicleHAL [label="call state / mic mute"]
+	AudioHAL -> Speakers [label="PCM audio"]
+	GNSSHAL -> GPS [label="NMEA/raw fix"]
+	Compositor -> DisplayHAL [label="composited surface"]
+	DisplayHAL -> Screen [label="pixel data"]
+	VehicleHAL -> CANBus [label="vehicle signals"]
+	NavSvc -> Compositor [label="map overlay surface" color=gray30 style=dashed]
+}
